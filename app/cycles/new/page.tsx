@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -21,7 +21,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { FeedbackDialog } from '@/components/feedback/feedback-dialog';
-import { Info } from 'lucide-react';
 
 // Mock skills data - replace with actual data fetching
 const mockSkills = [
@@ -54,7 +53,8 @@ const formSchema = z.object({
   isPublic: z.boolean().default(false),
 });
 
-export default function NewCyclePage() {
+// Component that uses useSearchParams
+function NewCyclePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const skillId = searchParams.get('skillId');
@@ -249,7 +249,7 @@ export default function NewCyclePage() {
                     </FormDescription>
                     <FormControl>
                       <Textarea
-                        placeholder="Based on my reflection, I've concluded that..."
+                        placeholder="Based on my reflections, I learned that..."
                         className="min-h-[120px]"
                         {...field}
                         onChange={(e) => {
@@ -272,11 +272,11 @@ export default function NewCyclePage() {
                   <FormItem>
                     <FormLabel className="text-lg font-semibold">Active Experimentation</FormLabel>
                     <FormDescription className="mb-4">
-                      Plan how to apply your insights. What will you do differently next time? How will you test your theories in practice?
+                      Plan how to apply your learning. How will you test your theories in future situations? What will you do differently next time?
                     </FormDescription>
                     <FormControl>
                       <Textarea
-                        placeholder="For my next steps, I plan to..."
+                        placeholder="Based on what I've learned, next time I will..."
                         className="min-h-[120px]"
                         {...field}
                         onChange={(e) => {
@@ -305,9 +305,9 @@ export default function NewCyclePage() {
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Make this learning cycle public</FormLabel>
+                    <FormLabel>Make Public</FormLabel>
                     <FormDescription>
-                      Allow others to view and comment on your learning process
+                      Allow others to view and learn from your learning cycle
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -315,37 +315,32 @@ export default function NewCyclePage() {
             />
           </div>
 
-          <div className="border-t pt-6 flex justify-between items-center">
-            {canGetFeedback ? (
-              <div className="flex items-center">
-                <FeedbackDialog
-                  cycleData={{
-                    id: 'new',
-                    title: watchedValues.title,
-                    concreteExperience: watchedValues.concreteExperience,
-                    reflectiveObservation: watchedValues.reflectiveObservation,
-                    abstractConceptualization: watchedValues.abstractConceptualization,
-                    activeExperimentation: watchedValues.activeExperimentation,
-                  }}
-                />
-                <span className="ml-2 text-sm text-muted-foreground">Get AI feedback before submitting</span>
-              </div>
-            ) : (
-              <div className="flex items-center text-muted-foreground text-sm">
-                <Info className="h-4 w-4 mr-1" />
-                <span>Complete all sections to get AI feedback</span>
-              </div>
+          <div className="flex gap-4 justify-end">
+            {canGetFeedback && (
+              <FeedbackDialog
+                cycleData={{
+                  id: 'new',
+                  title: form.getValues('title'),
+                  concreteExperience: form.getValues('concreteExperience'),
+                  reflectiveObservation: form.getValues('reflectiveObservation'),
+                  abstractConceptualization: form.getValues('abstractConceptualization'),
+                  activeExperimentation: form.getValues('activeExperimentation'),
+                }}
+              />
             )}
-
-            <div className="flex space-x-4">
-              <Button type="button" variant="outline" onClick={() => router.back()}>
-                Cancel
-              </Button>
-              <Button type="submit">Save Learning Cycle</Button>
-            </div>
+            <Button type="submit">Save Learning Cycle</Button>
           </div>
         </form>
       </Form>
     </div>
+  );
+}
+
+// Main page component with Suspense
+export default function NewCyclePage() {
+  return (
+    <Suspense fallback={<div className="container mx-auto px-4 py-8">Loading...</div>}>
+      <NewCyclePageContent />
+    </Suspense>
   );
 } 
