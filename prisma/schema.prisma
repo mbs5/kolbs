@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(cuid())
+  clerkId       String         @unique
+  name          String?
+  email         String         @unique
+  image         String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  skills        Skill[]
+  learningCycles LearningCycle[]
+  comments      Comment[]
+}
+
+model Skill {
+  id            String         @id @default(cuid())
+  name          String
+  description   String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  userId        String
+  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningCycles LearningCycle[]
+}
+
+model LearningCycle {
+  id                       String   @id @default(cuid())
+  title                    String
+  createdAt                DateTime @default(now())
+  updatedAt                DateTime @updatedAt
+  concreteExperience       String
+  reflectiveObservation    String
+  abstractConceptualization String
+  activeExperimentation    String
+  completedAt              DateTime?
+  skillId                  String
+  skill                    Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  userId                   String
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments                 Comment[]
+  isPublic                 Boolean  @default(false)
+}
+
+model Comment {
+  id             String        @id @default(cuid())
+  content        String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  learningCycleId String
+  learningCycle  LearningCycle @relation(fields: [learningCycleId], references: [id], onDelete: Cascade)
+}
