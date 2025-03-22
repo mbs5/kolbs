@@ -4,6 +4,9 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { prisma } from "@/lib/prisma";
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = "force-dynamic";
+
 export async function POST(request: NextRequest) {
   // Get the headers
   const headersList = await headers();

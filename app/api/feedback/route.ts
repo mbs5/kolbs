@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { OpenAI } from "openai";
 import { getCurrentUser } from '@/lib/user';
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = "force-dynamic";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -56,17 +59,11 @@ export async function POST(request: NextRequest) {
       Also provide an overall evaluation of the learning cycle and how well the stages connect to each other.
       Format your response in JSON with the following structure:
       {
-        "stages": {
-          "concreteExperience": { "rating": number, "feedback": string, "improvements": string },
-          "reflectiveObservation": { "rating": number, "feedback": string, "improvements": string },
-          "abstractConceptualization": { "rating": number, "feedback": string, "improvements": string },
-          "activeExperimentation": { "rating": number, "feedback": string, "improvements": string }
-        },
-        "overall": {
-          "rating": number,
-          "feedback": string,
-          "connections": string
-        }
+        "concreteExperience": { "rating": number, "feedback": string },
+        "reflectiveObservation": { "rating": number, "feedback": string },
+        "abstractConceptualization": { "rating": number, "feedback": string },
+        "activeExperimentation": { "rating": number, "feedback": string },
+        "overallFeedback": string
       }
     `;
 

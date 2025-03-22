@@ -3,6 +3,9 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/user";
 import { Prisma } from "@prisma/client";
 
+// Force dynamic rendering to avoid static generation issues
+export const dynamic = "force-dynamic";
+
 export async function GET(request: NextRequest) {
   try {
     // Get the authenticated user
